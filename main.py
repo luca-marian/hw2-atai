@@ -26,7 +26,7 @@ VAL_TASK2 = os.path.join(TASK2_PATH, "val_data")
 
 def get_options():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", type=str, help="path to dataset", default="")
+    parser.add_argument("--dataset_root", type=str, help="path to dataset", default="")
     parser.add_argument(
         "--result_dir",
         type=str,
@@ -71,9 +71,11 @@ transform = transforms.Compose(
 
 
 def train_task1(options):
-    if options.dataset == "":
+    if options.dataset_root == "":
         options.dataset_root = DATA_PATH
         options.dataset = TASK1_PATH
+    else:
+        options.dataset = os.path.join(options.dataset_root, "task1")
 
     options.dataset_train = os.path.join(
         options.dataset, "train_data", "annotations.csv"
@@ -153,14 +155,17 @@ def train_task1(options):
 
 
 def train_task2(options):
-    if options.dataset == "":
+    if options.dataset_root == "":
+        options.dataset_root = DATA_PATH
         options.dataset = TASK2_PATH
+    else:
+        options.dataset = os.path.join(options.dataset_root, "task2")
 
     options.dataset_train = os.path.join(
-        options.dataset_train, "train_data", "annotations.csv"
+        options.dataset, "train_data", "annotations.csv"
     )
 
-    options.dataset_valid = os.path.join(options.dataset_train, "val_data")
+    options.dataset_valid = os.path.join(options.dataset, "val_data")
 
     dataset = LabeledData(options.dataset_train, transform, options)
 
@@ -197,6 +202,14 @@ def train_task2(options):
         optimizer_student,
         scheduler_student,
     ) = models.get_model()
+
+    print("Train co-teaching model")
+    m1, m2 = train.train_co_teaching(
+        train_loader, valid_loader, num_epochs=options.n_epoch, options=options
+    )
+
+    utils.create_submission(m1, transform, options.task_name, options)
+    utils.create_submission(m2, transform, options.task_name, options)
 
 
 def main(options):

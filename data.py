@@ -12,11 +12,14 @@ class LabeledData(Dataset):
     def __init__(self, annotation_file, transform=None, options=None) -> None:
         if isinstance(annotation_file, pd.DataFrame):
             self._annotations = annotation_file
+            self._annotations.columns = ["sample", "label"]
         else:
             self._annotations = pd.read_csv(annotation_file)
+            self._annotations.columns = ["sample", "label"]
             self._annotations["sample"] = (
                 options.dataset_root + "/" + self._annotations["sample"]
             )
+
         self.labels = self._annotations["label"]
         self.images_path = self._annotations["sample"]
         self.transform = transform

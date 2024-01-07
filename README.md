@@ -16,3 +16,9 @@ As a result, some labels might become either under-represented or over-represent
 
 ### Important Note
 For Task 2, I changed the column names to match the format used in the first task within the code.
+
+### How to run
+The code is structured to execute the best results obtained from my experiments. To run either of the two tasks, you need to specify the root directory where Task1 and Task2 are located. To execute a specific task, it is necessary to specify the task name.
+```
+python main.py --dataset_root "/Users/marianluca/Documents/Master/ATAI_DNN" --task_name "task1" --n_epoch 1
+```

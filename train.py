@@ -7,7 +7,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
-import torchvision
 from torchvision.io import read_image, ImageReadMode
 from torchvision import datasets, models, transforms
 from torch.utils.data import DataLoader, Dataset, Subset
@@ -331,7 +330,7 @@ def train_step(data_loader, model_list: list, optimizer, criterion, rt, options)
     model2 = model2.train()
     for x, y in data_loader:
         # Forward and Backward propagation
-        x, y, y_hat = (
+        x, y = (
             x.to(options.device),
             y.to(options.device),
         )
@@ -339,8 +338,8 @@ def train_step(data_loader, model_list: list, optimizer, criterion, rt, options)
         out1 = model1(x)
         out2 = model2(x)
 
-        model1_loss = criterion(out1, y_hat)
-        model2_loss = criterion(out2, y_hat)
+        model1_loss = criterion(out1, y)
+        model2_loss = criterion(out2, y)
         model1_loss, model2_loss = co_teaching_loss(
             model1_loss=model1_loss, model2_loss=model2_loss, rt=rt, options=options
         )
@@ -390,8 +389,8 @@ def update_reduce_step(cur_step, num_gradual, tau=0.5):
 def train_co_teaching(
     train_data_loader,
     valid_data_loader,
-    tau=0.5,
-    num_gradual=15,
+    tau=0.2,
+    num_gradual=5,
     num_epochs=10,
     lr=0.001,
     model1=None,
