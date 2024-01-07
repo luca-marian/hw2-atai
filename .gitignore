@@ -16,3 +16,6 @@ __pycache__/
 #Data
 data/task1/
 data/task2/
+
+#Models
+*.pt
